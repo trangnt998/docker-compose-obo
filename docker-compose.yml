@@ -1,0 +1,35 @@
+version: "3.1"
+
+services:
+  mysql:
+    image: mysql:8.0
+    environment:
+      - MYSQL_ROOT_PASSWORD=123456
+      - MYSQL_USER=admin
+      - MYSQL_PASSWORD=123456
+      - MYSQL_DATABASE=obo
+    volumes:
+      - /var/lib/mysql
+      - ./obo.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - obo_network
+
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    environment:
+      MYSQL_HOST: mysql
+      PORT: 8080
+      MYSQL_USER: root
+    ports:
+      - "8005:8080"
+    networks:
+      - obo_network
+    depends_on:
+      - mysql
+
+# tao network ten la obo_network
+networks:
+  obo_network:
+    driver: bridge
